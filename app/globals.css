@@ -1,0 +1,633 @@
+:root {
+  --ink: #1c2e1a;
+  --moss: #3d5a2e;
+  --leaf: #a9c77a;
+  --paper: #e3f1c4;
+  --wall: #d4e7b0;
+  --mortar: #bdd596;
+
+  /* Rooyin: body (400) and display (700); Plex Mono: small code-like labels */
+  --display: var(--font-rooyin), system-ui, sans-serif;
+  --body: var(--font-rooyin), system-ui, sans-serif;
+  --mono: var(--font-plex), ui-monospace, monospace;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  background: var(--wall);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+svg {
+  display: block;
+}
+
+a {
+  color: var(--ink);
+}
+
+button {
+  cursor: pointer;
+}
+
+/* no grey flash on tap in mobile browsers; buttons show their own pressed state */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px dashed var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- scene ---------- */
+
+.scene {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.bricks {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- corner buttons ---------- */
+
+.corners {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.corners-left,
+.corners-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.corner-btn {
+  pointer-events: auto;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  border: 4px solid var(--ink);
+  box-shadow: inset 0 0 0 3px var(--leaf), 4px 4px 0 var(--moss);
+}
+
+.corner-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 0 0 0 3px var(--leaf), 2px 2px 0 var(--moss);
+}
+
+/* ---------- layout ---------- */
+
+.stage {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 96px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-inner {
+  width: 100%;
+  max-width: 920px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 32px 28px;
+}
+
+.left-col {
+  position: relative;
+  width: 340px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* tabs (72px) + the card's 8px outer frame: the bubble and the card both start here */
+  --card-x: 80px;
+}
+
+/* ---------- speech bubble ---------- */
+
+.bubble {
+  position: relative;
+  align-self: stretch; /* same left edge and width as the card */
+  margin-top: 8px; /* room for the 8px frame so the column starts at its outer edge */
+  margin-left: var(--card-x);
+  padding: 10px 8px;
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.2;
+  /* double frame + the same hard shadow as the card */
+  box-shadow: 0 0 0 4px var(--paper), 0 0 0 8px var(--ink), 8px 8px 0 8px var(--moss);
+}
+
+
+/* ---------- tabs + profile card ---------- */
+
+.card-row {
+  margin-top: 36px; /* keeps the column as tall as the tallest panel screen */
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 8px; /* the card's outer frame */
+  width: 100%;
+  justify-content: center;
+}
+
+.tabs {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+}
+
+.tab {
+  width: 72px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  border: 4px solid var(--ink);
+  border-right: none;
+  box-shadow: inset 0 0 0 2px var(--leaf);
+  font-family: var(--body);
+  font-size: 15px;
+}
+
+.tab[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: inset 0 0 0 2px var(--moss);
+  transform: translateX(8px);
+}
+
+.card {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 0;
+  min-width: 0;
+  margin-left: calc(var(--card-x) - 72px); /* tabs end exactly at the frame */
+  padding: 14px;
+  background: var(--ink);
+  box-shadow: 0 0 0 4px var(--paper), 0 0 0 8px var(--ink), 8px 8px 0 8px var(--moss);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.avatar {
+  flex: none;
+  width: 204px; /* 192px portrait + 6px frame each side */
+  height: 204px;
+  background: var(--leaf);
+  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 6px var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* pixel portrait: frames stacked in one box; mouse hover / finger hold steps to the real photo */
+.portrait {
+  position: relative;
+  width: 192px;
+  height: 192px;
+  background: var(--ink);
+  /* holding a finger on it must not select it or pop up the image menu */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.portrait-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.portrait-frame--pixel {
+  image-rendering: pixelated; /* hard-edged pixels, never smoothed */
+}
+
+.portrait-frame.is-shown {
+  opacity: 1;
+}
+.card-name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  color: var(--paper);
+  text-align: center;
+}
+
+.card-role {
+  font-size: 18px;
+  color: var(--leaf);
+}
+
+/* sits under the column without adding to its height, so the panel ends level with the card */
+.footer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  margin-top: 28px;
+  padding-left: 72px;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--moss);
+}
+
+/* ---------- window panel ---------- */
+
+.panel {
+  flex: 1 1 360px;
+  max-width: 480px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 20px 28px 24px;
+  background: var(--paper);
+  border: 4px solid var(--ink);
+  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 6px var(--moss), 8px 8px 0 var(--moss);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.panel-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+
+.narrow {
+  margin: 0 auto;
+  max-width: 300px;
+}
+
+.left {
+  text-align: left;
+}
+
+/* tutorial */
+
+.snake {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.snake-hud {
+  width: 100%;
+  max-width: 408px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.snake-board {
+  position: relative;
+  width: 100%;
+  max-width: 408px; /* 25 cols x 16px + border */
+  box-sizing: border-box;
+  background: var(--leaf);
+  border: 4px solid var(--ink);
+  box-shadow: inset 0 0 0 2px var(--moss);
+}
+
+/* while playing, swipes steer the snake instead of scrolling the page */
+.snake-board--playing {
+  touch-action: none;
+}
+
+.snake-board svg {
+  width: 100%;
+  height: auto;
+}
+
+.snake-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.snake-label {
+  padding: 4px 10px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.snake-blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+.snake-hint {
+  font-size: 14px;
+  color: var(--moss);
+}
+
+/* keyboard wording by default; tap wording on touch-only devices */
+.only-touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .only-keys {
+    display: none;
+  }
+
+  .only-touch {
+    display: inline;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* bio */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 18px;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 15px;
+  padding: 4px 10px;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* skills */
+
+.skills {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.skill {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.bar {
+  display: flex;
+  gap: 3px;
+}
+
+.seg {
+  flex: 1;
+  height: 14px;
+  background: var(--leaf);
+}
+
+.seg--on {
+  background: var(--ink);
+}
+
+/* projects */
+
+.projects {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.project {
+  padding: 4px 12px;
+  border: 4px solid var(--ink);
+  background: var(--wall);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.project-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.project-desc {
+  color: var(--moss);
+}
+
+.project-link {
+  flex: none;
+  padding: 10px 0;
+}
+
+/* home */
+
+.home-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.text-link {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 8px;
+  background: none;
+  border: none;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 20px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* contact */
+
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.contact-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  background: var(--leaf);
+  border: 4px solid var(--ink);
+  text-decoration: none;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 var(--moss);
+}
+
+/* pressed in, like the corner buttons */
+.contact-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--moss);
+}
+
+button.contact-btn {
+  width: 100%;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.contact-btn svg {
+  margin-right: 10px;
+}
+
+.contact-btn--primary {
+  background: var(--ink);
+  color: var(--paper);
+  /* same 4px border as the light buttons (in ink), so every button is the same size */
+  border-color: var(--ink);
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 800px) {
+  .panel {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+
+  .footer {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  /* corner buttons become a top bar */
+  .corners {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    padding: 16px 16px 0;
+  }
+
+  .corners-left,
+  .corners-right {
+    flex-direction: row;
+  }
+
+  .stage {
+    min-height: 0;
+    padding: 32px 16px 96px;
+  }
+
+  .panel {
+    padding: 24px 20px 28px;
+  }
+}
+
+@media (max-width: 400px) {
+  /* keep the greeting on two lines in the narrower bubble */
+  .bubble {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snake-blink {
+    animation: none;
+  }
+
+}
