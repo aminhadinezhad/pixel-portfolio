@@ -1,8 +1,12 @@
 import { bio, contact, game, home, projects, resume, sections, skills, type SectionId } from "@/data/content";
+import { playSfx } from "@/lib/sfx";
 import { Icon } from "./icons";
 import { SnakeGame } from "./SnakeGame";
 
 export type Screen = "start" | "game" | SectionId;
+
+/** id of the panel element (section tabs scroll to it on phones) */
+export const PANEL_ID = "panel";
 
 type Props = {
   screen: Screen;
@@ -14,10 +18,17 @@ type Props = {
 const isExternal = (href: string) => /^https?:\/\//.test(href);
 const externalProps = (href: string) =>
   isExternal(href) ? { target: "_blank", rel: "noopener noreferrer" } : {};
+const clickSound = () => playSfx("click");
 
 function ResumeButton({ href }: { href: string }) {
   return (
-    <a href={href} download={resume.downloadName} type="application/pdf" className="contact-btn contact-btn--primary">
+    <a
+      href={href}
+      download={resume.downloadName}
+      type="application/pdf"
+      className="contact-btn contact-btn--primary"
+      onClick={clickSound}
+    >
       <Icon name="download" />
       {resume.label}
     </a>
@@ -28,7 +39,7 @@ export function Panel({ screen, resumeHref, onNavigate }: Props) {
   // The game screen is just the board, no heading.
   if (screen === "game") {
     return (
-      <section className="panel" aria-label={game.name}>
+      <section id={PANEL_ID} className="panel" aria-label={game.name}>
         <SnakeGame />
       </section>
     );
@@ -37,7 +48,7 @@ export function Panel({ screen, resumeHref, onNavigate }: Props) {
   const title = screen === "start" ? home.title : sections.find((s) => s.id === screen)!.title;
 
   return (
-    <section className="panel" aria-live="polite" aria-labelledby="panel-title">
+    <section id={PANEL_ID} className="panel" aria-live="polite" aria-labelledby="panel-title">
       <h2 id="panel-title" className="panel-title">
         {title}
       </h2>
@@ -99,7 +110,13 @@ export function Panel({ screen, resumeHref, onNavigate }: Props) {
                 <br />
                 <span className="project-desc">{p.description}</span>
               </span>
-              <a href={p.href} className="project-link" aria-label={`Open ${p.title}`} {...externalProps(p.href)}>
+              <a
+                href={p.href}
+                className="project-link"
+                aria-label={`Open ${p.title}`}
+                onClick={clickSound}
+                {...externalProps(p.href)}
+              >
                 &gt; OPEN
               </a>
             </li>
@@ -116,6 +133,7 @@ export function Panel({ screen, resumeHref, onNavigate }: Props) {
                 key={link.label}
                 href={link.href}
                 className={link.primary ? "contact-btn contact-btn--primary" : "contact-btn"}
+                onClick={clickSound}
                 {...externalProps(link.href)}
               >
                 {link.label}

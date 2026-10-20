@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import { game as text } from "@/data/content";
+import { playSfx } from "@/lib/sfx";
 import { INK, MOSS, PAPER } from "./pixelArt";
 
 const COLS = 25;
@@ -93,6 +94,7 @@ export function SnakeGame() {
   const start = useCallback(() => {
     turns.current = [];
     const base = gameRef.current.status === "paused" ? gameRef.current : START;
+    playSfx("start");
     commit({ ...base, status: "playing" });
   }, [commit]);
 
@@ -108,7 +110,11 @@ export function SnakeGame() {
     if (game.status !== "playing") return;
     const id = window.setInterval(() => {
       const dir = turns.current.shift() ?? gameRef.current.dir;
-      commit(step(gameRef.current, dir));
+      const prev = gameRef.current;
+      const next = step(prev, dir);
+      if (next.status === "over") playSfx("gameOver");
+      else if (next.score > prev.score) playSfx("eat");
+      commit(next);
     }, speed);
     return () => window.clearInterval(id);
   }, [game.status, speed, commit]);
@@ -121,8 +127,10 @@ export function SnakeGame() {
       if (e.code === "Space") {
         e.preventDefault(); // also stops Space from pressing whichever button has focus
         if (e.repeat) return;
-        if (g.status === "playing") commit({ ...g, status: "paused" });
-        else start();
+        if (g.status === "playing") {
+          playSfx("pause");
+          commit({ ...g, status: "paused" });
+        } else start();
       } else if (KEYS[e.code] && g.status === "playing") {
         e.preventDefault();
         turn(KEYS[e.code]);

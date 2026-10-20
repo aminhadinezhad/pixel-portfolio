@@ -108,6 +108,16 @@ button {
   box-shadow: inset 0 0 0 3px var(--leaf), 4px 4px 0 var(--moss);
 }
 
+/* phones only: page footer at the very bottom (desktop keeps .footer under the card) */
+.site-footer {
+  display: none;
+}
+
+/* phones only: fixed in the bottom-right corner (see the 800px breakpoint) */
+.back-to-top {
+  display: none;
+}
+
 .corner-btn:active {
   transform: translate(2px, 2px);
   box-shadow: inset 0 0 0 3px var(--leaf), 2px 2px 0 var(--moss);
@@ -285,11 +295,12 @@ button {
 .footer {
   position: absolute;
   top: 100%;
-  left: 0;
+  left: var(--card-x); /* spans the card, so the text is centred under it */
   right: 0;
-  text-align: center;
+  display: flex;
+  justify-content: center; /* if the line is wider than the card it overflows evenly on both sides */
+  white-space: nowrap;
   margin-top: 28px;
-  padding-left: 72px;
   font-family: var(--mono);
   font-size: 14px;
   color: var(--moss);
@@ -298,6 +309,7 @@ button {
 /* ---------- window panel ---------- */
 
 .panel {
+  scroll-margin-top: 16px; /* breathing room when a tab scrolls it into view */
   flex: 1 1 360px;
   max-width: 480px;
   min-width: 0;
@@ -583,13 +595,36 @@ button.contact-btn {
 /* ---------- responsive ---------- */
 
 @media (max-width: 800px) {
+  .back-to-top {
+    display: flex;
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 5;
+  }
+
   .panel {
     flex-basis: 100%;
     max-width: 100%;
   }
 
   .footer {
-    position: static;
+    display: none; /* replaced by .site-footer at the bottom of the page */
+  }
+
+  .stage {
+    padding-bottom: 32px;
+  }
+
+  .site-footer {
+    display: block;
+    position: relative;
+    z-index: 2;
+    padding: 0 16px 88px; /* clears the fixed back-to-top button (52px + 16px) */
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--moss);
   }
 }
 
@@ -610,7 +645,7 @@ button.contact-btn {
 
   .stage {
     min-height: 0;
-    padding: 32px 16px 96px;
+    padding: 32px 16px;
   }
 
   .panel {

@@ -1,24 +1,21 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { isSoundEnabled, loadSoundPreference, playSfx, setSoundEnabled, subscribeSound } from "@/lib/sfx";
 
-export type Sfx = "select";
+export type { Sfx } from "@/lib/sfx";
 
-/**
- * Sound on/off state plus a stable `play` hook point.
- * `play` is a no-op for now; plug 8-bit sfx (e.g. Web Audio square waves) in here later.
- */
-export function useSound(initial = true) {
-  const [enabled, setEnabled] = useState(initial);
-  const enabledRef = useRef(enabled);
-  enabledRef.current = enabled;
+/** Sound on/off state (shared with every component that calls playSfx) plus `play`. */
+export function useSound() {
+  const enabled = useSyncExternalStore(subscribeSound, isSoundEnabled, () => true);
 
-  const toggle = useCallback(() => setEnabled((on) => !on), []);
+  useEffect(() => loadSoundPreference(), []);
 
-  const play = useCallback((sfx: Sfx) => {
-    if (!enabledRef.current) return;
-    void sfx; // TODO: trigger the matching 8-bit sound effect
+  const toggle = useCallback(() => {
+    const next = !isSoundEnabled();
+    setSoundEnabled(next);
+    if (next) playSfx("soundOn"); // hear that sound is back
   }, []);
 
-  return { enabled, toggle, play };
+  return { enabled, toggle, play: playSfx };
 }

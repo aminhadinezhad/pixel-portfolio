@@ -6,7 +6,7 @@ export const profile = {
   name: "Amin Hadinezhad",
   role: "Frontend Developer",
   greeting: ["Hello!", "Welcome to my web portfolio."],
-  footer: "© 2026 | amin.dev",
+  footer: "Amin Hadinezhad · amin.dev · © 2026", // under the card on desktop, at the page bottom on phones
 };
 
 export const sections: { id: SectionId; label: string; title: string }[] = [

@@ -1,12 +1,16 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { game, profile, sections, type SectionId } from "@/data/content";
 import { useSound } from "@/hooks/useSound";
-import { Panel, type Screen } from "./Panel";
+import { BackToTop } from "./BackToTop";
+import { PANEL_ID, Panel, type Screen } from "./Panel";
 import { Icon, type IconName } from "./icons";
 import { PixelPortrait } from "./PixelPortrait";
 import { MORTAR, WALL } from "./pixelArt";
+
+// Same breakpoint as the CSS that stacks the panel under the card.
+const STACKED = "(max-width: 800px)";
 
 const TAB_ICONS: Record<SectionId, IconName> = {
   bio: "user",
@@ -27,6 +31,19 @@ export default function Portfolio({ resumeHref }: { resumeHref: string | null })
     [play],
   );
 
+  // On phones the panel sits below the card, so the tabs and top buttons scroll down to it.
+  const [scrollRequest, setScrollRequest] = useState(0);
+  const openSection = (id: Screen) => {
+    go(id);
+    if (window.matchMedia(STACKED).matches) setScrollRequest((n) => n + 1);
+  };
+
+  useEffect(() => {
+    if (!scrollRequest) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById(PANEL_ID)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }, [scrollRequest]);
+
   return (
     <div className="scene">
       {/* brick wall */}
@@ -42,10 +59,10 @@ export default function Portfolio({ resumeHref }: { resumeHref: string | null })
 
       <header className="corners">
         <div className="corners-left">
-          <button type="button" className="corner-btn" aria-label="Home" onClick={() => go("start")}>
+          <button type="button" className="corner-btn" aria-label="Home" onClick={() => openSection("start")}>
             <Icon name="home" />
           </button>
-          <button type="button" className="corner-btn" aria-label="About me" onClick={() => go("bio")}>
+          <button type="button" className="corner-btn" aria-label="About me" onClick={() => openSection("bio")}>
             <Icon name="info" />
           </button>
         </div>
@@ -64,7 +81,7 @@ export default function Portfolio({ resumeHref }: { resumeHref: string | null })
             className="corner-btn"
             aria-label={game.open}
             aria-pressed={screen === "game"}
-            onClick={() => go("game")}
+            onClick={() => openSection("game")}
           >
             <Icon name="gamepad" />
           </button>
@@ -88,7 +105,7 @@ export default function Portfolio({ resumeHref }: { resumeHref: string | null })
                     type="button"
                     className="tab"
                     aria-pressed={screen === s.id}
-                    onClick={() => go(s.id)}
+                    onClick={() => openSection(s.id)}
                   >
                     <Icon name={TAB_ICONS[s.id]} />
                     <span>{s.label}</span>
@@ -111,6 +128,9 @@ export default function Portfolio({ resumeHref }: { resumeHref: string | null })
           <Panel screen={screen} resumeHref={resumeHref} onNavigate={go} />
         </div>
       </main>
+
+      <footer className="site-footer">{profile.footer}</footer>
+      <BackToTop />
     </div>
   );
 }

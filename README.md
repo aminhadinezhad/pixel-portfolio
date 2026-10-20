@@ -30,7 +30,9 @@ the Home screen and the Snake game labels.
 | `components/Panel.tsx` | The right-hand panel screens |
 | `components/PixelPortrait.tsx` | Pixel portrait that reveals the photo on hover / touch |
 | `components/SnakeGame.tsx` | The Snake mini-game |
+| `components/BackToTop.tsx` | Back-to-top button (phones) |
 | `components/icons.tsx` | UI icons ([Pixelarticons](https://pixelarticons.com), MIT) |
+| `lib/sfx.ts` | 8-bit sound effects (Web Audio, no audio files) and the mute switch |
 
 ## Credits
 
